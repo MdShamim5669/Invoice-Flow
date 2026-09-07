@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme inline {
   --color-background: var(--background);
@@ -14,13 +16,33 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0b0c13;
+    --foreground: #f1f5f9;
   }
 }
 
+.dark {
+  --background: #0b0c13;
+  --foreground: #f1f5f9;
+}
+
+html.dark,
+body.dark,
+.dark body {
+  background-color: #0b0c13;
+  background-image: 
+    radial-gradient(ellipse 65% 55% at 95% 45%, rgba(185, 70, 130, 0.16) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 45% at 85% 85%, rgba(135, 75, 215, 0.13) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 10% 20%, rgba(79, 70, 229, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 35% at 50% 0%, rgba(145, 90, 230, 0.08) 0%, transparent 65%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
 }
