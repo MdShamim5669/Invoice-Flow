@@ -93,15 +93,12 @@ export function SlidingAuthCard({ initialMode = 'signin' }: SlidingAuthCardProps
   const handleSocialSignIn = async (provider: SocialProvider) => {
     setSocialLoadingProvider(provider);
     try {
-      const callbackURL = typeof window !== 'undefined'
-        ? `${window.location.origin}${redirectPath.startsWith('/') ? redirectPath : `/${redirectPath}`}`
-        : redirectPath;
-
+      const targetPath = redirectPath.startsWith('/') ? redirectPath : `/${redirectPath}`;
       toast.loading(`Redirecting to ${provider.toUpperCase()} authentication...`, { id: 'social-auth' });
 
       const result = await signIn.social({
         provider,
-        callbackURL,
+        callbackURL: targetPath,
       });
 
       if (result && (result as any).error) {
