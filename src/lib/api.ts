@@ -18,16 +18,8 @@ api.interceptors.response.use(
     return response;
   },
   (error: AxiosError<ApiError>) => {
-    if (error.response?.status === 401) {
-      // Allow pages like dashboard to render demo/offline preview rather than blank bounce
-      const isMutating = error.config?.method && ['post', 'put', 'patch', 'delete'].includes(error.config.method.toLowerCase());
-      if (isMutating && typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-        const currentPath = window.location.pathname;
-        if (currentPath !== '/login' && currentPath !== '/signup') {
-          window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-        }
-      }
-    }
+    // Note: Allow calling services to handle 401 (either via offline fallback or user prompt)
+
 
 
     const message =

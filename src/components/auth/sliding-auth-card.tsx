@@ -98,7 +98,7 @@ export function SlidingAuthCard({ initialMode = 'signin' }: SlidingAuthCardProps
 
       const result = await signIn.social({
         provider,
-        callbackURL: targetPath,
+        callbackURL: '/dashboard',
       });
 
       if (result && (result as any).error) {
@@ -136,7 +136,11 @@ export function SlidingAuthCard({ initialMode = 'signin' }: SlidingAuthCardProps
         toast.error(result.error.message || 'Invalid email or password');
       } else {
         toast.success('Welcome back to InvoiceFlow!');
-        router.push(redirectPath);
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard';
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (err: any) {
       toast.error(err.message || 'Login failed. Please check your credentials.');
@@ -165,7 +169,11 @@ export function SlidingAuthCard({ initialMode = 'signin' }: SlidingAuthCardProps
         toast.error(result.error.message || 'Signup failed');
       } else {
         toast.success('Account created successfully! Welcome to InvoiceFlow.');
-        router.push('/dashboard');
+        if (typeof window !== 'undefined') {
+          window.location.href = '/dashboard';
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch (err: any) {
       toast.error(err.message || 'Something went wrong during signup');
@@ -210,11 +218,11 @@ export function SlidingAuthCard({ initialMode = 'signin' }: SlidingAuthCardProps
       {/* Top Floating Navigation */}
       <div className="flex items-center justify-between mb-4 max-w-5xl mx-auto px-2">
         <Link
-          href="/"
+          href="/dashboard"
           className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3.5 py-1.5 rounded-full border border-white/10 backdrop-blur-md"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Home</span>
+          <span>Explore Overview (Guest Preview)</span>
         </Link>
         <div className="flex items-center gap-2 text-xs text-slate-400">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

@@ -10,24 +10,20 @@ import {
   Zap,
   Calendar,
   ShoppingBag,
-  SlidersHorizontal,
   Bell,
   Settings,
-  Sparkles,
   LogOut,
-  User,
   CheckCircle2,
   Clock,
+  LogIn,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from 'sonner';
 import { CoolThemeToggle } from '@/components/lightswind/cool-theme-toggle';
 import { motion, AnimatePresence } from 'framer-motion';
 
-
 export const PillNav: React.FC = () => {
   const pathname = usePathname();
-  const { user, signOut, isAuthenticated } = useAuth();
+  const { user, signOut } = useAuth();
 
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -210,67 +206,83 @@ export const PillNav: React.FC = () => {
             <Settings className="w-3.5 h-3.5" />
           </Link>
 
-          {/* User Profile Avatar with dropdown */}
-          <div className="relative ml-1">
-            <button
-              onClick={() => {
-                setIsProfileOpen(!isProfileOpen);
-                setIsNotifOpen(false);
-              }}
-              className="relative w-8 h-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 cursor-pointer block ring-2 ring-transparent hover:ring-indigo-500/50 transition-all"
+          {/* User Profile Avatar with dropdown or Sign In button */}
+          {user ? (
+            <div className="relative ml-1">
+              <button
+                onClick={() => {
+                  setIsProfileOpen(!isProfileOpen);
+                  setIsNotifOpen(false);
+                }}
+                className="relative w-8 h-8 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 cursor-pointer block ring-2 ring-transparent hover:ring-indigo-500/50 transition-all"
+              >
+                {user.image ? (
+                  <Image
+                    src={user.image}
+                    alt={user.name || 'User'}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white text-xs font-bold uppercase">
+                    {(user.name || user.email || 'U').charAt(0)}
+                  </div>
+                )}
+              </button>
+
+              {/* Profile Dropdown */}
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-2 z-50"
+                  >
+                    <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-[10px] text-slate-400 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+
+                    <div className="py-1">
+                      <Link
+                        href="/settings"
+                        onClick={() => setIsProfileOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                      >
+                        <Settings className="w-3.5 h-3.5" />
+                        Company Settings
+                      </Link>
+
+                      <button
+                        onClick={() => {
+                          setIsProfileOpen(false);
+                          signOut();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm shadow-indigo-600/30 transition-all cursor-pointer ml-1 hover:scale-105 active:scale-95"
             >
-              <Image
-                src="/images/avatar_james.jpg"
-                alt="User profile"
-                fill
-                className="object-cover"
-              />
-            </button>
-
-            {/* Profile Dropdown */}
-            <AnimatePresence>
-              {isProfileOpen && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: -8 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -8 }}
-                  transition={{ duration: 0.18, ease: 'easeOut' }}
-                  className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-2 z-50"
-                >
-                  <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-800">
-                    <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                      {user?.name || 'Rafiq Ahmed'}
-                    </p>
-                    <p className="text-[10px] text-slate-400 truncate">
-                      {user?.email || 'rafiq@invoiceflow.dev'}
-                    </p>
-                  </div>
-
-                  <div className="py-1">
-                    <Link
-                      href="/settings"
-                      onClick={() => setIsProfileOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
-                    >
-                      <Settings className="w-3.5 h-3.5" />
-                      Company Settings
-                    </Link>
-
-                    <button
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        signOut();
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors cursor-pointer"
-                    >
-                      <LogOut className="w-3.5 h-3.5" />
-                      Sign Out
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

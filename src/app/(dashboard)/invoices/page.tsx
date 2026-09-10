@@ -28,12 +28,14 @@ import {
   FilePlus2,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 type SortField = 'date' | 'amount' | 'client' | 'invoiceId';
 type SortOrder = 'asc' | 'desc';
 
 export default function InvoicesAndBillingPage() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Pagination State
@@ -97,6 +99,16 @@ export default function InvoicesAndBillingPage() {
   }, []);
 
   const handleDelete = async (id: string, invoiceNum: string) => {
+    if (!isAuthenticated) {
+      toast.error('Authentication required', {
+        description: 'Please sign in or register to delete invoices.',
+        action: {
+          label: 'Log In',
+          onClick: () => router.push('/login?redirect=/invoices'),
+        },
+      });
+      return;
+    }
     if (!confirm(`Are you sure you want to delete invoice ${invoiceNum}?`)) return;
     try {
       await deleteInvoiceMutation.mutateAsync(id);
@@ -174,13 +186,26 @@ export default function InvoicesAndBillingPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/invoices/new"
+          <button
+            type="button"
+            onClick={() => {
+              if (!isAuthenticated) {
+                toast.error('Authentication required', {
+                  description: 'Please sign in or register to create invoices.',
+                  action: {
+                    label: 'Log In',
+                    onClick: () => router.push('/login?redirect=/invoices/new'),
+                  },
+                });
+                return;
+              }
+              router.push('/invoices/new');
+            }}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[#18181B] hover:bg-black dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 text-white shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             + Add invoice
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -442,13 +467,26 @@ export default function InvoicesAndBillingPage() {
                           ? `No records matching "${search}".`
                           : 'You have no invoices created yet on your account.'}
                       </p>
-                      <Link
-                        href="/invoices/new"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-slate-800 transition-colors shadow-xs"
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            toast.error('Authentication required', {
+                              description: 'Please sign in or register to create invoices.',
+                              action: {
+                                label: 'Log In',
+                                onClick: () => router.push('/login?redirect=/invoices/new'),
+                              },
+                            });
+                            return;
+                          }
+                          router.push('/invoices/new');
+                        }}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Create your first invoice
-                      </Link>
+                      </button>
                     </div>
                   </td>
                 </tr>

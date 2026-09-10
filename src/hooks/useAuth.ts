@@ -8,8 +8,17 @@ export function useAuth() {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push('/login');
+    try {
+      await signOut();
+    } catch {
+      // ignore
+    }
+    // Hard navigate directly to login page so session and cache are cleanly cleared
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    } else {
+      router.push('/login');
+    }
   };
 
   return {

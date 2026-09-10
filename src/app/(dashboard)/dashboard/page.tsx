@@ -29,10 +29,12 @@ import {
   X,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 import { StaggerContainer, StaggerItem, FadeIn } from '@/components/ui/motion-wrapper';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const { data: stats, isLoading: statsLoading } = useDashboardQuery();
   const { data: invoicesData, isLoading: invoicesLoading, refetch: refetchInvoices } = useInvoicesQuery();
   const { data: clients = [] } = useClientsQuery();
@@ -202,13 +204,26 @@ export default function DashboardPage() {
           </button>
 
           {/* "+ Create an invoice" purple button */}
-          <Link
-            href="/invoices/new"
+          <button
+            type="button"
+            onClick={() => {
+              if (!isAuthenticated) {
+                toast.error('Authentication required', {
+                  description: 'Please sign in or register to create invoices.',
+                  action: {
+                    label: 'Log In',
+                    onClick: () => router.push('/login?redirect=/invoices/new'),
+                  },
+                });
+                return;
+              }
+              router.push('/invoices/new');
+            }}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold bg-gradient-to-r from-indigo-600 via-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white shadow-md shadow-indigo-600/30 transition-all hover:scale-102 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Create an invoice
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -510,7 +525,19 @@ export default function DashboardPage() {
               invoice={selectedInvoice}
               companyName={companySettings?.companyName || 'Finnova Studio'}
               onOpenPayment={(inv) => setPaymentModalInvoice(inv)}
-              onAddItem={() => router.push('/invoices/new')}
+              onAddItem={() => {
+                if (!isAuthenticated) {
+                  toast.error('Authentication required', {
+                    description: 'Please sign in or register to create invoices.',
+                    action: {
+                      label: 'Log In',
+                      onClick: () => router.push('/login?redirect=/invoices/new'),
+                    },
+                  });
+                  return;
+                }
+                router.push('/invoices/new');
+              }}
             />
           </div>
         </div>

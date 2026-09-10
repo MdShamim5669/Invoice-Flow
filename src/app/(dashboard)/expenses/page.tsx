@@ -16,8 +16,12 @@ import { Expense, CreateExpenseInput } from '@/types/expense';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Plus, Trash2, Sparkles, Upload, Receipt, RefreshCw, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ExpensesPage() {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const { data: expensesData, refetch, isLoading, isRefetching } = useExpensesQuery();
   const { data: summary } = useExpenseSummaryQuery();
   const createExpenseMutation = useCreateExpenseMutation();
@@ -41,6 +45,16 @@ export default function ExpensesPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error('Authentication required', {
+        description: 'Please log in or register to record expenses.',
+        action: {
+          label: 'Log In',
+          onClick: () => router.push('/login?redirect=/expenses'),
+        },
+      });
+      return;
+    }
     if (!formData.vendor || !formData.amount) {
       toast.error('Please specify vendor and amount');
       return;
@@ -68,6 +82,16 @@ export default function ExpensesPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!isAuthenticated) {
+      toast.error('Authentication required', {
+        description: 'Please log in or register to delete expenses.',
+        action: {
+          label: 'Log In',
+          onClick: () => router.push('/login?redirect=/expenses'),
+        },
+      });
+      return;
+    }
     if (!confirm('Are you sure you want to delete this expense?')) return;
     try {
       await deleteExpenseMutation.mutateAsync(id);
@@ -151,15 +175,42 @@ export default function ExpensesPage() {
 
           <Button
             variant="outline"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => {
+              if (!isAuthenticated) {
+                toast.error('Authentication required', {
+                  description: 'Please log in or register to scan receipts.',
+                  action: {
+                    label: 'Log In',
+                    onClick: () => router.push('/login?redirect=/expenses'),
+                  },
+                });
+                return;
+              }
+              fileInputRef.current?.click();
+            }}
             isLoading={isAiScanning}
-            className="gap-2 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 bg-indigo-50/40 dark:bg-indigo-950/20"
+            className="gap-2 border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 bg-indigo-50/40 dark:bg-indigo-950/20 cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-indigo-600" />
             AI Scan Receipt
           </Button>
 
-          <Button onClick={() => setIsModalOpen(true)} className="gap-2">
+          <Button
+            onClick={() => {
+              if (!isAuthenticated) {
+                toast.error('Authentication required', {
+                  description: 'Please log in or register to log expenses.',
+                  action: {
+                    label: 'Log In',
+                    onClick: () => router.push('/login?redirect=/expenses'),
+                  },
+                });
+                return;
+              }
+              setIsModalOpen(true);
+            }}
+            className="gap-2 cursor-pointer"
+          >
             <Plus className="w-4 h-4" />
             Log Expense
           </Button>

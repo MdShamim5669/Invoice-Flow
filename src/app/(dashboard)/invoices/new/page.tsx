@@ -14,6 +14,7 @@ import { Invoice } from '@/types/invoice';
 import { computeInvoiceTotals, formatCurrency, round2 } from '@/lib/utils';
 import { Plus, Trash2, Sparkles, ArrowLeft, Save, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LineItemState {
   description: string;
@@ -23,6 +24,7 @@ interface LineItemState {
 
 function NewInvoiceContent() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const searchParams = useSearchParams();
   const urlClientId = searchParams.get('clientId');
 
@@ -106,6 +108,16 @@ function NewInvoiceContent() {
 
   const handleQuickAddClient = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error('Authentication required', {
+        description: 'Please sign in or register to add clients.',
+        action: {
+          label: 'Log In',
+          onClick: () => router.push('/login?redirect=/invoices/new'),
+        },
+      });
+      return;
+    }
     if (!newClientName.trim()) {
       toast.error('Client name is required');
       return;
@@ -132,6 +144,16 @@ function NewInvoiceContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      toast.error('Authentication required', {
+        description: 'Please sign in or register to create and send invoices.',
+        action: {
+          label: 'Log In',
+          onClick: () => router.push('/login?redirect=/invoices/new'),
+        },
+      });
+      return;
+    }
     if (!selectedClientId) {
       toast.error('Please select or add a client');
       return;

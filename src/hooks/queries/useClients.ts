@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import ClientService from '@/services/client.service';
-import { CreateClientInput, UpdateClientInput } from '@/types/client';
+import { CreateClientInput } from '@/types/client';
 
 export const CLIENTS_QUERY_KEY = ['clients'];
 

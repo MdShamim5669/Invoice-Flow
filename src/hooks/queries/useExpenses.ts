@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import ExpenseService from '@/services/expense.service';
-import { CreateExpenseInput, UpdateExpenseInput } from '@/types/expense';
+import { CreateExpenseInput } from '@/types/expense';
 
 export const EXPENSES_QUERY_KEY = ['expenses'];
 
